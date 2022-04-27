@@ -32,7 +32,7 @@ Once you have `shplug` installed on your machine, you can get all those goodies 
 shplug env add <env-name> <git-repo-url>
 ```
 
-For example, I clone my dotfiles using:
+For example, I clone my [dotfiles](https://github.com/dtrugman/dotfiles) using:
 ```
 shplug env add dotfiles https://github.com/dtrugman/dotfiles
 ```
@@ -44,8 +44,10 @@ When you run the command, the following will happen:
 1. The `install` script is going to be executed, just in case you want to automatically add the new `scripts` directory into your `$PATH` without any additional manual steps, install `plug.vim` and run `:PlugInstall` or do anything else automatically every time you sync the environment.
 
 Notes:
-1. `home` is a hard-coded keyword for the `$HOME` of the user that will be using the environment. `scripts` is just an arbitrary name you can use. Any other name will work as well
 1. The `install` file is optional
+1. `home` is a hard-coded keyword for the `$HOME` of the user that will be using the environment. `scripts` is just an arbitrary name you can use. Any other name will work as well
+1. You can use other root-level directories in your repository, as in, have an `app` directory next to `home`. When calling `shplug env add`, it will try to create and link those files under `/app` on your machine. Make sure that this directory exists and owned by your user, otherwise `shplug add env` will fail due to lack of permissions to create a directory under `/`.
+    - Another option is to run the command as a superuser while retaining your user's `$HOME` configuration. This might work but will definitely require further `chown`-s to fix the permissions on all the cloned files, hence ill-advised.
 
 ### Plan on changing your scripts? Great!
 
@@ -82,7 +84,3 @@ curl -L "https://github.com/dtrugman/shplug/releases/download/v0.1.0/install_zsh
 ## Feature requests & Contributions
 
 You are more than welcome to ask/do both!
-
-## Licensing
-
-[Apache-2.0 License](https://tldrlegal.com/license/apache-license-2.0-(apache-2.0))
