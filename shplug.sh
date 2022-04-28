@@ -530,6 +530,23 @@ __shplug_import_main() {
 }
 
 # ==========================================================
+# Update
+# ==========================================================
+
+__shplug_update_hint() {
+    __shplug_info "Usage: $script_name upgrade $@"
+}
+
+__shplug_update_main() {
+    if [[ $# -ne 0 ]]; then
+        __shplug_update_hint
+        return 2
+    fi
+
+    (cd $app_dir; git pull)
+}
+
+# ==========================================================
 # Main
 # ==========================================================
 
@@ -539,7 +556,7 @@ __shplug_version() {
 
 __shplug_main() {
     if [[ $# -lt 1 ]]; then
-        __shplug_info "Usage: $script_name [version|plugin|env|import] (params)..."
+        __shplug_info "Usage: $script_name [version|plugin|env|import|update] (params)..."
         return 2
     fi
 
@@ -563,6 +580,10 @@ __shplug_main() {
             __shplug_import_main "$@"
             ;;
 
+        update)
+            __shplug_update_main "$@"
+            ;;
+
         *)
             __shplug_error "Unknown command [$cmd]"
             return 2;;
@@ -577,6 +598,7 @@ shplug() {
     declare -r script_name="shplug"
 
     declare -r root_dir="$HOME/.$script_name"
+    declare -r app_dir="$root_dir/app"
 
     declare -r plugins_dir="$root_dir/plugin"
     __shplug_plugin_baseline
