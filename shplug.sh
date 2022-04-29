@@ -63,23 +63,28 @@ __shplug_prompt_yes_no() {
 # Environment related functionality
 # ==========================================================
 
-__shplug_env_hint() {
-    __shplug_info "Usage: $script_name env $@"
-}
-
 __shplug_env_dir() {
     local plugin_name="$1"
     __shplug_return_str "$envs_dir/$plugin_name"
 }
 
+__shplug_env_cd_help() {
+    __shplug_info "
+Change directory into an existing environment
+
+Usage: $script_name env cd [env-name]
+"
+}
+
 __shplug_env_cd() {
-    if [[ $# -ne 1 ]]; then
-        __shplug_env_hint "cd [env-name]"
+    if [[ $# -ne 1 || "$1" == "--help" ]]; then
+        __shplug_env_cd_help
         return 2
     fi
 
     local env_name="$1"
     local env_dir="$(__shplug_env_dir "$env_name")"
+
     cd "$env_dir"
 }
 
@@ -92,9 +97,17 @@ __shplug_env_enum() {
     ls -1 "$envs_dir"
 }
 
+__shplug_env_list_help() {
+    __shplug_info "
+List all existing environments
+
+Usage: $script_name env list
+"
+}
+
 __shplug_env_list() {
     if [[ $# -ne 0 ]]; then
-        __shplug_env_hint "list"
+        __shplug_env_list_help
         return 2
     fi
 
@@ -208,9 +221,20 @@ __shplug_env_install() {
     fi
 }
 
+__shplug_env_add_help() {
+    __shplug_info "
+Add a new environment
+
+Usage: $script_name env add [env-name] [env-repo]
+
+  env-name        A custom name for this environment
+  env-repo        An environment git repo to clone
+"
+}
+
 __shplug_env_add() {
     if [[ $# -ne 2 ]]; then
-        __shplug_env_hint "add [env-name] [env-repo]"
+        __shplug_env_add_help
         return 2
     fi
 
@@ -243,9 +267,19 @@ __shplug_env_add() {
     return 0
 }
 
+__shplug_env_remove_help() {
+    __shplug_info "
+Remove an existing environment
+
+Usage: $script_name env remove [env-name]
+
+  env-name       The custom name of the environment to remove
+"
+}
+
 __shplug_env_remove() {
-    if [[ $# -ne 1 ]]; then
-        __shplug_env_hint "remove [env-name]"
+    if [[ $# -ne 1 || "$1" == "--help" ]]; then
+        __shplug_env_remove_help
         return 2
     fi
 
@@ -274,9 +308,25 @@ __shplug_env_baseline() {
     fi
 }
 
+__shplug_env_help() {
+    __shplug_info "
+Manage synced environments
+
+Usage: $script_name env [command] (params)...
+
+Commands:
+  add            Add environment
+  remove         Remove environment
+  list           List all environments
+  cd             Change directory into an environment
+
+Run '$script_name env [command] --help' for more information on a command
+"
+}
+
 __shplug_env_main() {
     if [[ $# -lt 1 ]]; then
-        __shplug_env_hint "[add|remove|cd|list] (params)..."
+        __shplug_env_help
         return 2
     fi
 
@@ -284,35 +334,18 @@ __shplug_env_main() {
     shift
 
     case "$cmd" in
-        add)
-            __shplug_env_add "$@"
-            ;;
-
-        remove)
-            __shplug_env_remove "$@"
-            ;;
-
-        cd)
-            __shplug_env_cd "$@"
-            ;;
-
-        list)
-            __shplug_env_list
-            ;;
-
-        *)
-            __shplug_error "Unknown command [$cmd]"
-            return 2;;
+        add)    __shplug_env_add    "$@" ;;
+        remove) __shplug_env_remove "$@" ;;
+        list)   __shplug_env_list   "$@" ;;
+        cd)     __shplug_env_cd     "$@" ;;
+        --help) __shplug_env_help        ;;
+        *)      __shplug_error "Unknown command [$cmd]"; return 2 ;;
     esac
 }
 
 # ==========================================================
 # Plugin related functionality
 # ==========================================================
-
-__shplug_plugin_hint() {
-    __shplug_info "Usage: $script_name plugin $@"
-}
 
 __shplug_plugin_file() {
     local plugin_name="$1"
@@ -328,9 +361,17 @@ __shplug_plugin_enum() {
     ls -1 "$plugins_dir"
 }
 
+__shplug_plugin_list_help() {
+    __shplug_info "
+List all existing plugins
+
+Usage: $script_name plugin list
+"
+}
+
 __shplug_plugin_list() {
     if [[ $# -ne 0 ]]; then
-        __shplug_plugin_hint "list"
+        __shplug_plugin_list_help
         return 2
     fi
 
@@ -341,7 +382,7 @@ __shplug_plugin_list() {
     done
 }
 
-__shplug_plugin_load() {
+__shplug_plugin_load_single() {
     local plugin_name="$1"
     local plugin_file="$(__shplug_plugin_file "$plugin_name")"
 
@@ -354,20 +395,39 @@ __shplug_plugin_load() {
     source "$plugin_file"
 }
 
-__shplug_plugin_load_all() {
+__shplug_plugin_load_help() {
+    __shplug_info "
+Load (source) all existing plugins
+
+Usage: $script_name plugin load
+"
+}
+
+__shplug_plugin_load() {
     if [[ $# -ne 0 ]]; then
-        __shplug_plugin_hint "load"
+        __shplug_plugin_load_help
         return 2
     fi
 
     for plugin_name in $(__shplug_plugin_enum);  do
-        __shplug_plugin_load "$plugin_name"
+        __shplug_plugin_load_single "$plugin_name"
     done
 }
 
+__shplug_plugin_edit_help() {
+    __shplug_info "
+Manually edit an existing plugin
+Editor resolution order: \$VISUAL, \$EDITOR, vi
+
+Usage: $script_name plugin edit [plugin-name]
+
+  plugin-name        The name of the plugin to edit
+"
+}
+
 __shplug_plugin_edit() {
-    if [[ $# -ne 1 ]]; then
-        __shplug_plugin_hint "edit [plugin-name]"
+    if [[ $# -ne 1 || "$1" == "--help" ]]; then
+        __shplug_plugin_edit_help
         return 2
     fi
 
@@ -391,9 +451,21 @@ __shplug_plugin_exists() {
     [[ -f "$plugin_file" || -L "$plugin_link" ]]
 }
 
+__shplug_plugin_add_help() {
+    __shplug_info "
+Add a new plugin
+
+Usage: $script_name plugin add [plugin-name] [plugin-url]
+
+  plugin-name        A custom name for this plugin
+  plugin-url         A remote URL from which to download the plugin
+                     Use 'file:///<absolute-path>' for a local path
+"
+}
+
 __shplug_plugin_add() {
     if [[ $# -ne 2 ]]; then
-        __shplug_plugin_hint "add [plugin-name] [plugin-url]"
+        __shplug_plugin_add_help
         return 2
     fi
 
@@ -419,15 +491,25 @@ __shplug_plugin_add() {
         return 1
     fi
 
-    __shplug_plugin_load "$plugin_name"
+    __shplug_plugin_load_single "$plugin_name"
 
     __shplug_info "Plugin [$plugin_name] successfully installed & loaded"
     return 0
 }
 
+__shplug_plugin_remove_help() {
+    __shplug_info "
+Remove an existing plugin
+
+Usage: $script_name plugin remove [plugin-name]
+
+  plugin-name        The name of the plugin to remove
+"
+}
+
 __shplug_plugin_remove() {
-    if [[ $# -ne 1 ]]; then
-        __shplug_plugin_hint "remove [plugin-name]"
+    if [[ $# -ne 1 || "$1" == "--help" ]]; then
+        __shplug_plugin_remove_help
         return 2
     fi
 
@@ -457,9 +539,26 @@ __shplug_plugin_baseline() {
     fi
 }
 
+__shplug_plugin_help() {
+    __shplug_info "
+Manage single file shell plugins (gists, scripts & more)
+
+Usage: $script_name plugin [command] (params)...
+
+Commands:
+  add            Add plugin
+  remove         Remove plugin
+  list           List all plugins
+  load           Source all plugin scripts
+  edit           Manually edit a plugin script
+
+Run '$script_name plugin [command] --help' for more information on a command
+"
+}
+
 __shplug_plugin_main() {
     if [[ $# -lt 1 ]]; then
-        __shplug_plugin_hint "[add|remove|load|edit|list] (params)..."
+        __shplug_plugin_help
         return 2
     fi
 
@@ -467,29 +566,13 @@ __shplug_plugin_main() {
     shift
 
     case "$cmd" in
-        add)
-            __shplug_plugin_add "$@"
-            ;;
-
-        remove)
-            __shplug_plugin_remove "$@"
-            ;;
-
-        load)
-            __shplug_plugin_load_all
-            ;;
-
-        edit)
-            __shplug_plugin_edit "$@"
-            ;;
-
-        list)
-            __shplug_plugin_list
-            ;;
-
-        *)
-            __shplug_error "Unknown command [$cmd]"
-            return 2;;
+        add)    __shplug_plugin_add    "$@" ;;
+        remove) __shplug_plugin_remove "$@" ;;
+        list)   __shplug_plugin_list   "$@" ;;
+        load)   __shplug_plugin_load   "$@" ;;
+        edit)   __shplug_plugin_edit   "$@" ;;
+        --help) __shplug_plugin_help        ;;
+        *)      __shplug_error "Unknown plugin command [$cmd]"; return 2 ;;
     esac
 }
 
@@ -497,18 +580,23 @@ __shplug_plugin_main() {
 # Import
 # ==========================================================
 
-__shplug_import_hint() {
-    __shplug_info "Usage: $script_name import $@"
+__shplug_import_help() {
+    __shplug_info "
+Easily import configuration from a file
+Runs every line in a file as if called '$script_name <line>'
+
+Usage: $script_name import [config-file]
+"
 }
 
 __shplug_import_main() {
-    if [[ $# -ne 1 ]]; then
-        __shplug_import_hint "[config-file]"
+    if [[ $# -ne 1 || "$1" == "--help" ]]; then
+        __shplug_import_help
         return 2
     fi
 
     local config_file="$1"
-    __shplug_debug "Importing config file [$config_file]"
+    __shplug_debug "Importing from config file [$config_file]"
 
     if [[ ! -f "$config_file" ]]; then
         __shplug_error "Config file [$config_file] doesn't exist!"
@@ -533,13 +621,17 @@ __shplug_import_main() {
 # Update
 # ==========================================================
 
-__shplug_update_hint() {
-    __shplug_info "Usage: $script_name upgrade $@"
+__shplug_update_help() {
+    __shplug_info "
+Update $script_name to latest version
+
+Usage: $script_name upgrade
+"
 }
 
 __shplug_update_main() {
     if [[ $# -ne 0 ]]; then
-        __shplug_update_hint
+        __shplug_update_help
         return 2
     fi
 
@@ -547,16 +639,37 @@ __shplug_update_main() {
 }
 
 # ==========================================================
-# Main
+# Version
 # ==========================================================
 
 __shplug_version() {
-    __shplug_info "Shplug version $script_version"
+    __shplug_info "shplug v$script_version"
+}
+
+# ==========================================================
+# Main
+# ==========================================================
+
+__shplug_main_help() {
+    __shplug_info "
+Your new shell environment manager
+
+Usage: $script_name [command] (params)...
+
+Commands:
+  env            Manage environments
+  plugin         Manage plugins
+  import         Import environments and plugins from file
+  update         Update shplug to the latest version
+  version        Print version information and exit
+
+Run '$script_name [command] --help' for more information on a command
+"
 }
 
 __shplug_main() {
     if [[ $# -lt 1 ]]; then
-        __shplug_info "Usage: $script_name [version|plugin|env|import|update] (params)..."
+        __shplug_main_help
         return 2
     fi
 
@@ -564,29 +677,13 @@ __shplug_main() {
     shift
 
     case "$cmd" in
-        version)
-            __shplug_version
-            ;;
-
-        plugin)
-            __shplug_plugin_main "$@"
-            ;;
-
-        env)
-            __shplug_env_main "$@"
-            ;;
-
-        import)
-            __shplug_import_main "$@"
-            ;;
-
-        update)
-            __shplug_update_main "$@"
-            ;;
-
-        *)
-            __shplug_error "Unknown command [$cmd]"
-            return 2;;
+        version) __shplug_version          ;;
+        plugin)  __shplug_plugin_main "$@" ;;
+        env)     __shplug_env_main    "$@" ;;
+        import)  __shplug_import_main "$@" ;;
+        update)  __shplug_update_main "$@" ;;
+        --help)  __shplug_main_help        ;;
+        *)       __shplug_error "Unknown shplug command [$cmd]"; return 2 ;;
     esac
 }
 

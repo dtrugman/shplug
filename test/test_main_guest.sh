@@ -244,6 +244,39 @@ test_env() {
     return 0
 }
 
+test_help_menu() {
+    if ! shplug "$@" | grep -q "Usage"; then
+        failure "'shplug $@' didn't show help menu"
+        return 1
+    fi
+}
+
+test_help_menus() {
+    test_help_menu "--help" || return 1
+
+    test_help_menu "plugin" || return 1
+    test_help_menu "plugin" "--help" || return 1
+    test_help_menu "plugin" "add" "--help" || return 1
+    test_help_menu "plugin" "remove" "--help" || return 1
+    test_help_menu "plugin" "list" "--help" || return 1
+    test_help_menu "plugin" "load" "--help" || return 1
+    test_help_menu "plugin" "edit" "--help" || return 1
+
+    test_help_menu "env" || return 1
+    test_help_menu "env" "--help" || return 1
+    test_help_menu "env" "add" "--help" || return 1
+    test_help_menu "env" "remove" "--help" || return 1
+    test_help_menu "env" "list" "--help" || return 1
+    test_help_menu "env" "cd" "--help" || return 1
+
+    test_help_menu "import" "--help" || return 1
+
+    test_help_menu "update" "--help" || return 1
+
+    success
+    return 0
+}
+
 main() {
     declare -r temp_dir="/tmp"
     declare -r guest_root="/app"
@@ -255,6 +288,9 @@ main() {
     # when we run the script with a non-interactive shell,
     # the .XXXrc file is not sourced
     source "${HOME}/.${SHELL}rc"
+
+    test_title "Test help menus"
+    test_help_menus || true
 
     test_title "Test plugin"
     test_plugin || true
