@@ -1,11 +1,5 @@
 # This is the main script for running the script from WITHIN THE CONTAINER.
 
-setup_title() {
-    echo "==============================================================="
-    echo "SETUP: $@"
-    echo "==============================================================="
-}
-
 test_title() {
     echo "==============================================================="
     echo "TEST #$test_index: $@"
@@ -13,33 +7,23 @@ test_title() {
     ((test_index++))
 }
 
+color_echo() {
+    local color="$1"
+    shift
+
+    local prefix="\033[${color}m"
+    local suffix="\033[0m"
+    echo -e "${prefix}${@}${suffix}"
+}
+
 failure() {
-    echo "ERROR: $@"
+    local red="0;31"
+    color_echo "$red" "!!! ERROR: $@"
 }
 
 success() {
-    echo "==> SUCCESS"
-}
-
-install_shplug() {
-    local install_script="install_$shell"
-    local remote_repo='https:\/\/github.com\/dtrugman\/shplug.git'
-    local local_repo='\/app'
-    sed "s/$remote_repo/$local_repo/g" "$install_script" > "$temp_dir/$install_script"
-    if ! cat "$temp_dir/$install_script" | "$shell"; then
-        failure "Failed to run install script"
-        return 1
-    fi
-
-    source "$HOME/.${shell}rc"
-
-    if ! shplug version; then
-        failure "Failed to query shplug version"
-        return 1
-    fi
-
-    success
-    return 0
+    local green="0;32"
+    color_echo "$green" "===> SUCCESS"
 }
 
 test_plugin_prepare() {
@@ -264,19 +248,13 @@ main() {
     declare -r temp_dir="/tmp"
     declare -r guest_root="/app"
 
-    if [[ -n "$ZSH_VERSION" ]]; then
-        declare -r shell="zsh"
-    elif [[ -n "$BASH_VERSION" ]]; then
-        declare -r shell="bash"
-    else
-        failure "Unsupported shell, aborting..."
-        return 1
-    fi
-
-    setup_title "Installing shplug"
-    install_shplug || return 1
-
     declare test_index=1
+
+    # TODO: Find workaround
+    # Because we're installing shplug when creating the container,
+    # when we run the script with a non-interactive shell,
+    # the .XXXrc file is not sourced
+    source "${HOME}/.${SHELL}rc"
 
     test_title "Test plugin"
     test_plugin || true

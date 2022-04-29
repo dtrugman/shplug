@@ -1,28 +1,84 @@
 #/bin/bash
 
-test_shell() {
+docker_build() {
     local shell="$1"
+    shift
+
+    docker build \
+        --build-arg "shell=$shell" \
+        --tag "$image_name:$shell" \
+        --file "./test/Dockerfile" \
+        "$@" "."
+}
+
+manual_test() {
+    local shell="$1"
+
     echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-    echo "Testing shplug for shell: $shell"
+    echo "Building and running docker for manual testing [$shell]"
     echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
-    docker build -t "$image_name:$shell" "$host_root/test/$shell"
-    docker run --rm -v "$host_root:$guest_root" "$image_name:$shell"
+
+    docker_build "$shell"
+
+    docker run -it --rm "$image_name:$shell"
+}
+
+integration_test() {
+    local shell="$1"
+
+    echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+    echo "Building and running docker for integration testing [$shell]"
+    echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+
+    docker_build "$shell"
+
+    docker run --rm "$image_name:$shell" "/bin/$shell" "./test/test_main_guest.sh"
+}
+
+hint() {
+    echo "Usage: $0 [command]"
+    echo ""
+    echo "Commands:"
+    echo "  integration     Run full integration tests"
+    echo "  bash            Run interactive bash container for manual tests"
+    echo "  zsh             Run interactive zsh container for manual tests"
+    echo ""
 }
 
 main() {
-    declare -r host_root="$PWD"
     declare -r guest_root="/app"
+    declare -r image_name="shplug"
 
-    if [[ ! -d "$host_root/.git" ]]; then
+    if [[ ! -d "./.git" ]]; then
         echo "You seem to be running the tests from the wrong directory."
         echo "Please run the tests using the './test.sh' script from the root directory!"
         return 1
     fi
 
-    declare -r image_name="shplug"
+    if [[ "$#" -ne 1 ]]; then
+        hint
+        return 2
+    fi
 
-    test_shell "bash"
-    test_shell "zsh"
+    declare -r command="$1"
+    case "$command" in
+        integration)
+            integration_test "bash"
+            integration_test "zsh"
+            ;;
+
+        bash)
+            manual_test "bash"
+            ;;
+
+        zsh)
+            manual_test "zsh"
+            ;;
+
+        *)
+            hint
+            ;;
+    esac
 }
 
 main "$@"
