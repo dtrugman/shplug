@@ -37,12 +37,6 @@ __shplug_info() {
     echo "$@"
 }
 
-__shplug_debug() {
-    if [[ "$verbose" != "0" ]]; then
-        echo "$@"
-    fi
-}
-
 __shplug_prompt_yes_no() {
     printf "Do you approve? [y/N] "
     read answer
@@ -234,7 +228,6 @@ __shplug_env_add() {
 
     local env_name="$1"
     local env_repo="$2"
-    __shplug_debug "Adding plugin environment [$env_name] from [$env_repo]"
 
     local env_dir="$(__shplug_env_dir "$env_name")"
     if __shplug_env_exists "$env_dir"; then
@@ -278,7 +271,6 @@ __shplug_env_remove() {
     fi
 
     local env_name="$1"
-    __shplug_debug "Removing plugin environment [$env_name]"
 
     local env_dir="$(__shplug_env_dir "$env_name")"
     if ! __shplug_env_exists "$env_dir"; then
@@ -297,7 +289,6 @@ __shplug_env_remove() {
 
 __shplug_env_baseline() {
     if [[ ! -d "$envs_dir" ]]; then
-        __shplug_debug "Creating missing environments dir"
         mkdir "$envs_dir"
     fi
 }
@@ -385,7 +376,6 @@ __shplug_plugin_load_single() {
         return 1
     fi
 
-    __shplug_debug "Loading plugin [$plugin_name]"
     source "$plugin_file"
 }
 
@@ -465,7 +455,6 @@ __shplug_plugin_add() {
 
     local plugin_name="$1"
     local plugin_url="$2"
-    __shplug_debug "Adding plugin [$plugin_name] from [$plugin_url]"
 
     if __shplug_plugin_exists "$plugin_name"; then
         __shplug_info "Plugin [$plugin_name] already exists"
@@ -508,8 +497,6 @@ __shplug_plugin_remove() {
     fi
 
     local plugin_name="$1"
-    __shplug_debug "Removing plugin [$plugin_name]"
-
     if ! __shplug_plugin_exists "$plugin_name"; then
         __shplug_error "Plugin [$plugin_name] not found"
         return 0
@@ -528,7 +515,6 @@ __shplug_plugin_remove() {
 
 __shplug_plugin_baseline() {
     if [[ ! -d "$plugins_dir" ]]; then
-        __shplug_debug "Creating missing plugins dir"
         mkdir "$plugins_dir"
     fi
 }
@@ -590,8 +576,6 @@ __shplug_import_main() {
     fi
 
     local config_file="$1"
-    __shplug_debug "Importing from config file [$config_file]"
-
     if [[ ! -f "$config_file" ]]; then
         __shplug_error "Config file [$config_file] doesn't exist!"
         return 1
@@ -682,8 +666,6 @@ __shplug_main() {
 }
 
 shplug() {
-    declare -r verbose="${VERBOSE:-0}"
-
     declare -r script_version="0.1.0"
     declare -r script_name="shplug"
 
