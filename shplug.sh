@@ -472,8 +472,8 @@ __shplug_plugin_add() {
     fi
 
     if ! ln -s "$plugin_url" "$plugin_link"; then
-        rm -f "$plugin_file"
         __shplug_error "Plugin [$plugin_name] link creation failed"
+        __shplug_plugin_remove "$plugin_name"
         return 1
     fi
 
