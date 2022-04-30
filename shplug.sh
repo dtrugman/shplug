@@ -48,12 +48,13 @@ __shplug_prompt_yes_no() {
 # ==========================================================
 
 __shplug_env_dir() {
-    local plugin_name="$1"
-    __shplug_return_str "$envs_dir/$plugin_name"
+    local env_name="$1"
+    __shplug_return_str "$envs_dir/$env_name"
 }
 
 __shplug_env_exists() {
-    local env_dir="$1"
+    local env_name="$1"
+    local env_dir="$(__shplug_env_dir "$env_name")"
     [[ -d "$env_dir" ]]
 }
 
@@ -72,12 +73,13 @@ __shplug_env_cd() {
     fi
 
     local env_name="$1"
-    local env_dir="$(__shplug_env_dir "$env_name")"
-    if ! __shplug_env_exists "$env_dir"; then
+
+    if ! __shplug_env_exists "$env_name"; then
         __shplug_error "Environment [$env_name] not found"
         return 1
     fi
 
+    local env_dir="$(__shplug_env_dir "$env_name")"
     cd "$env_dir"
 }
 
@@ -229,12 +231,12 @@ __shplug_env_add() {
     local env_name="$1"
     local env_repo="$2"
 
-    local env_dir="$(__shplug_env_dir "$env_name")"
-    if __shplug_env_exists "$env_dir"; then
+    if __shplug_env_exists "$env_name"; then
         __shplug_info "Environment [$env_name] already exists"
         return 0
     fi
 
+    local env_dir="$(__shplug_env_dir "$env_name")"
     if ! git clone "$env_repo" "$env_dir"; then
         __shplug_error "Environment [$env_name] clone failed"
         return 1
@@ -272,12 +274,12 @@ __shplug_env_remove() {
 
     local env_name="$1"
 
-    local env_dir="$(__shplug_env_dir "$env_name")"
-    if ! __shplug_env_exists "$env_dir"; then
+    if ! __shplug_env_exists "$env_name"; then
         __shplug_info "Environment [$env_name] not found"
         return 0
     fi
 
+    local env_dir="$(__shplug_env_dir "$env_name")"
     if ! rm -rf "$env_dir"; then
         __shplug_error "Environment [$env_name] removal failed"
         return 1
