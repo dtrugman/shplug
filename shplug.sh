@@ -371,8 +371,8 @@ __shplug_plugin_list() {
 
 __shplug_plugin_load_single() {
     local plugin_name="$1"
-    local plugin_file="$(__shplug_plugin_file "$plugin_name")"
 
+    local plugin_file="$(__shplug_plugin_file "$plugin_name")"
     if [[ ! -f "$plugin_file" ]]; then
         __shplug_error "Plugin [$plugin_name] load failed"
         return 1
@@ -418,6 +418,7 @@ __shplug_plugin_edit() {
     fi
 
     local plugin_name="$1"
+
     if ! __shplug_plugin_exists "$plugin_name"; then
         __shplug_error "Plugin [$plugin_name] not found"
         return 1
@@ -499,6 +500,7 @@ __shplug_plugin_remove() {
     fi
 
     local plugin_name="$1"
+
     if ! __shplug_plugin_exists "$plugin_name"; then
         __shplug_error "Plugin [$plugin_name] not found"
         return 0
@@ -578,6 +580,7 @@ __shplug_import_main() {
     fi
 
     local config_file="$1"
+
     if [[ ! -f "$config_file" ]]; then
         __shplug_error "Config file [$config_file] doesn't exist!"
         return 1
