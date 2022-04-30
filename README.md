@@ -71,14 +71,8 @@ You could argue you can just add this script to your dotfiles repo, but life's d
 
 `shplug` currently officially supports `bash` and `zsh`:
 
-bash:
 ```
-curl -L "https://github.com/dtrugman/shplug/releases/download/v0.1.0/install_bash" | bash && source "$HOME/.bashrc"
-```
-
-zsh:
-```
-curl -L "https://github.com/dtrugman/shplug/releases/download/v0.1.0/install_zsh" | zsh && source "$HOME/.zshrc"
+source <(curl -L "https://github.com/dtrugman/shplug/releases/download/v0.1.0/install")
 ```
 
 ## Feature requests & Contributions

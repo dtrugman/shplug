@@ -1,0 +1,16 @@
+git clone "https://github.com/dtrugman/shplug.git" "$HOME/.shplug/app" || exit 1
+
+if [[ -n "$ZSH_VERSION" ]]; then
+    __shell="zsh"
+elif [[ -n "$BASH_VERSION" ]]; then
+    __shell="bash"
+else
+    echo "Unsupported shell"
+    exit 1
+fi
+
+__rcfile="${HOME}/.${__shell}rc"
+if [[ ! -f "$__rcfile" ]] || ! grep -q 'source "$HOME/.shplug/app/shplug.sh"' "$__rcfile"; then
+    printf '\n[[ -s "$HOME/.shplug/app/shplug.sh" ]] && source "$HOME/.shplug/app/shplug.sh"\n' >> \
+        "$__rcfile" || exit 1
+fi

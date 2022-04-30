@@ -1,8 +1,0 @@
-set -eu
-
-git clone "https://github.com/dtrugman/shplug.git" "$HOME/.shplug/app"
-
-rcfile="$HOME/.bashrc"
-if [[ ! -f "$rcfile" ]] || ! grep -q 'source "$HOME/.shplug/app/shplug.sh"' "$rcfile"; then
-    printf '\n[[ -s "$HOME/.shplug/app/shplug.sh" ]] && source "$HOME/.shplug/app/shplug.sh"\n' >> "$rcfile"
-fi

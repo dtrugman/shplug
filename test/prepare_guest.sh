@@ -7,11 +7,11 @@ success() {
 }
 
 install_shplug() {
-    local install_script="install_$shell"
+    local install_script="install"
     local remote_repo='https:\/\/github.com\/dtrugman\/shplug.git'
     local local_repo='\/app'
     sed "s/$remote_repo/$local_repo/g" "$install_script" > "$temp_dir/$install_script"
-    if ! cat "$temp_dir/$install_script" | "$shell"; then
+    if ! source <(cat "$temp_dir/$install_script"); then
         failure "Failed to run install script"
         return 1
     fi
