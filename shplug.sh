@@ -68,6 +68,11 @@ __shplug_env_dir() {
     __shplug_return_str "$envs_dir/$plugin_name"
 }
 
+__shplug_env_exists() {
+    local env_dir="$1"
+    [[ -d "$env_dir" ]]
+}
+
 __shplug_env_cd_help() {
     __shplug_info "
 Change directory into an existing environment
@@ -84,6 +89,10 @@ __shplug_env_cd() {
 
     local env_name="$1"
     local env_dir="$(__shplug_env_dir "$env_name")"
+    if ! __shplug_env_exists "$env_dir"; then
+        __shplug_error "Environment [$env_name] not found"
+        return 1
+    fi
 
     cd "$env_dir"
 }
@@ -115,11 +124,6 @@ __shplug_env_list() {
         local env_repo="$(__shplug_env_repo "$env_name")"
         __shplug_info "$env_name -> $env_repo"
     done
-}
-
-__shplug_env_exists() {
-    local env_dir="$1"
-    [[ -d "$env_dir" ]]
 }
 
 __shplug_env_link() {

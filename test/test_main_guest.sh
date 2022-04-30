@@ -199,6 +199,11 @@ test_env() {
         return 1
     fi
 
+    if ! (shplug env cd "$env_name"); then
+        failure "Failed to change directory into env"
+        return 1
+    fi
+
     if [[ ! -f "$HOME/$env_relative_gitconfig.shplug.bak" ]]; then
         failure "Existing gitconfig not backed-up as expected"
         return 1
