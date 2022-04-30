@@ -2,22 +2,12 @@
 # General utilities
 # ==========================================================
 
-__shplug_shell() {
-    if [[ -n "$ZSH_VERSION" ]]; then
-        __shplug_return_str "zsh"
-    elif [[ -n "$BASH_VERSION" ]]; then
-        __shplug_return_str "bash"
-    else
-        __shplug_return_str ""
-    fi
-}
-
 __shplug_in_zsh() {
-    [[ "$shell" == "zsh" ]]
+    [[ -n "$ZSH_VERSION" ]]
 }
 
 __shplug_in_bash() {
-    [[ "$shell" == "bash" ]]
+    [[ -n "$BASH_VERSION" ]]
 }
 
 __shplug_return_str() {
@@ -693,7 +683,6 @@ __shplug_main() {
 
 shplug() {
     declare -r verbose="${VERBOSE:-0}"
-    declare -r shell="$(__shplug_shell)"
 
     declare -r script_version="0.1.0"
     declare -r script_name="shplug"
