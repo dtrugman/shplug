@@ -1,4 +1,5 @@
-![shplug](./img/shplug.png "Logo")
+![shplug](./img/shplug-dark.png#gh-dark-mode-only)
+![shplug](./img/shplug-light.png#gh-light-mode-only)
 
 **Your new shell plugin manager** - An easy solution for managing your shell environments.
 
