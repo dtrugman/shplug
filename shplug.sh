@@ -135,7 +135,7 @@ __shplug_env_link() {
         fi
 
         dir="/$dir"
-        dir="${dir/\/home/"$HOME"}"
+        dir="${dir/\/home/$HOME}"
 
         target_files+=($dir/$basename)
         source_files+=($PWD/$file)
