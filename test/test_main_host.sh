@@ -6,7 +6,7 @@ docker_build() {
 
     docker build \
         --build-arg "shell=$shell" \
-        --tag "$image_name:$shell" \
+        --tag "$repo_name/$shell:$version" \
         --file "./test/Dockerfile" \
         "$@" "."
 }
@@ -20,7 +20,7 @@ manual_test() {
 
     docker_build "$shell"
 
-    docker run -it --rm "$image_name:$shell"
+    docker run -it --rm "$repo_name/$shell:$version"
 }
 
 integration_test() {
@@ -32,7 +32,7 @@ integration_test() {
 
     docker_build "$shell"
 
-    docker run --rm "$image_name:$shell" "/bin/$shell" "./test/test_main_guest.sh"
+    docker run --rm "$repo_name/$shell:$version" "/bin/$shell" "./test/test_main_guest.sh"
 }
 
 hint() {
@@ -47,7 +47,8 @@ hint() {
 
 main() {
     declare -r guest_root="/app"
-    declare -r image_name="shplug"
+    declare -r repo_name="shplug"
+    declare -r version="latest"
 
     if [[ ! -d "./.git" ]]; then
         echo "You seem to be running the tests from the wrong directory."
