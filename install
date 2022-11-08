@@ -14,3 +14,5 @@ if [[ ! -f "$__rcfile" ]] || ! grep -q 'source "$HOME/.shplug/app/shplug.sh"' "$
     printf '\n[[ -s "$HOME/.shplug/app/shplug.sh" ]] && source "$HOME/.shplug/app/shplug.sh"\n' >> \
         "$__rcfile" || exit 1
 fi
+
+source "$HOME/.shplug/app/shplug.sh"
