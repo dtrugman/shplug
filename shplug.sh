@@ -157,7 +157,7 @@ __shplug_env_link() {
 
     for file in ${target_files[@]}; do
         echo "Will create link [$file]"
-        if [[ -f "$file" ]]; then
+        if [[ -f "$file" && ! -L "$file" ]]; then
             echo " ! Existing file [$file] will be backed-up as [$file.$bak_ext]"
         fi
     done
