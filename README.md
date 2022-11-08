@@ -1,6 +1,5 @@
 ![shplug](./img/shplug-dark.png#gh-dark-mode-only)
 ![shplug](./img/shplug-light.png#gh-light-mode-only)
-
 **Your new shell plugin manager** - An easy solution for managing your shell environments.
 
 There are two main use patterns:
@@ -73,7 +72,7 @@ You could argue you can just add this script to your dotfiles repo, but life's d
 `shplug` currently officially supports `bash` and `zsh`:
 
 ```
-source <(curl -L "https://github.com/dtrugman/shplug/releases/download/v0.2.0/install")
+source <(curl -L "https://github.com/dtrugman/shplug/releases/download/v0.2.1/install")
 ```
 
 ## Feature requests & Contributions

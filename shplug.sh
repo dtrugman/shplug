@@ -671,7 +671,7 @@ __shplug_main() {
 }
 
 shplug() {
-    declare -r script_version="0.2.0"
+    declare -r script_version="0.2.1"
     declare -r script_name="shplug"
 
     declare -r root_dir="$HOME/.$script_name"
